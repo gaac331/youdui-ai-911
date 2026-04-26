@@ -19,14 +19,14 @@ export default function Home() {
 
     const cssLink = document.createElement("link");
     cssLink.rel = "stylesheet";
-    cssLink.href = "/assets/index-CvLP4j0m.css";
+    cssLink.href = "/assets/index-C0cBnkNx.css";
     document.head.appendChild(cssLink);
 
     const runtimeScript = document.createElement("script");
     runtimeScript.src = "/manus-runtime.js";
     runtimeScript.onload = () => {
       const appScript = document.createElement("script");
-      appScript.src = "/assets/index-DCyJ7Jf_.js";
+      appScript.src = "/assets/index-C3DptrF-.js";
       appScript.onload = () => {
         injectCustomizations();
       };
