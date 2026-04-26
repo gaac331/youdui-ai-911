@@ -1,27 +1,30 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Home page - loads the original YO·AI bundled application
+ * Home page - loads the original YO-AI bundled application
  * The original site is a pre-built React app with inline runtime + external JS/CSS
  * We load them dynamically to render the complete site
  */
 export default function Home() {
-  const loaded = useRef(false);
+  const hasLoaded = useRef(false);
 
   useEffect(() => {
-    if (loaded.current) return;
-    loaded.current = true;
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
 
+    // 清空 root
     const root = document.getElementById("root");
     if (root) {
       root.innerHTML = "";
     }
 
+    // 加载样式
     const cssLink = document.createElement("link");
     cssLink.rel = "stylesheet";
-    cssLink.href = "/assets/index-C0cBnkNx.css";
+    cssLink.href = "/assets/index-C0cBnklX.css";
     document.head.appendChild(cssLink);
 
+    // 加载运行时脚本
     const runtimeScript = document.createElement("script");
     runtimeScript.src = "/manus-runtime.js";
     runtimeScript.onload = () => {
@@ -38,6 +41,7 @@ export default function Home() {
   return null;
 }
 
+/** 在 bundle 渲染完成后，对 DOM 进行补丁修改 */
 function injectCustomizations() {
   const observer = new MutationObserver(() => {
     const downloadDiv = document.getElementById("download");
@@ -48,48 +52,46 @@ function injectCustomizations() {
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
-
-  setTimeout(() => {
-    const downloadDiv = document.getElementById("download");
-    if (downloadDiv) {
-      observer.disconnect();
-      addDownloadButton(downloadDiv);
-      shrinkFooterPadding();
-    }
-  }, 3000);
 }
 
-function addDownloadButton(downloadDiv: HTMLElement) {
-  if (downloadDiv.querySelector("[data-custom-download]")) return;
+/** 在 Hero 区底部添加“立即下载”按钮 */
+function addDownloadButton(container: HTMLElement) {
+  // 防止重复添加
+  if (document.getElementById("custom-download-btn")) return;
 
-  const btn = document.createElement("a");
-  btn.href = "/download";
-  btn.textContent = "立即下载";
-  btn.setAttribute("data-custom-download", "true");
-  Object.assign(btn.style, {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "1rem",
-    background: "linear-gradient(135deg, #7B61FF, #4F9BFF)",
-    padding: "0.75rem 2rem",
-    fontSize: "1.125rem",
-    fontWeight: "700",
-    color: "#fff",
-    textDecoration: "none",
-    boxShadow: "0 4px 20px rgba(123,97,255,0.4)",
-    transition: "opacity 0.2s",
-    cursor: "pointer",
-  });
-  btn.addEventListener("mouseenter", () => (btn.style.opacity = "0.85"));
-  btn.addEventListener("mouseleave", () => (btn.style.opacity = "1"));
+  const link = document.createElement("a");
+  link.id = "custom-download-btn";
+  link.href = "/download";
+  link.textContent = "立即下载";
+  link.style.cssText = `
+    display: inline-block;
+    background-color: #7c3aed;
+    color: white;
+    font-weight: bold;
+    padding: 12px 32px;
+    border-radius: 9999px;
+    font-size: 18px;
+    text-decoration: none;
+    margin-top: 24px;
+    transition: all 0.2s;
+    cursor: pointer;
+  `;
+  link.onmouseenter = () => (link.style.backgroundColor = "#6d28d9");
+  link.onmouseleave = () => (link.style.backgroundColor = "#7c3aed");
 
-  downloadDiv.appendChild(btn);
+  container.appendChild(link);
 }
 
+/** 缩小 Footer 的上下内边距 */
 function shrinkFooterPadding() {
   const footer = document.querySelector("footer");
   if (!footer) return;
-  footer.style.paddingTop = "2rem";
-  footer.style.paddingBottom = "2rem";
+
+  // 替换 pt-20 pb-8 为 py-6，保留其他类名
+  footer.className = footer.className
+    .replace(/pt-\d+/g, "")
+    .replace(/pb-\d+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  footer.className += " py-6";
 }
